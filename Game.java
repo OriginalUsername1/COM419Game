@@ -131,56 +131,56 @@ private class MouseControl extends MouseAdapter
 		
 		if (selectedRoom == -1)
 		{
-			if (x > 1340 && x < 1545)//left column
+			if (x > (int)(WIDTH*0.698)  && x < (int)(WIDTH*0.805))//left column
 			{
-				if (y > 545 && y < 605)//first row
+				if (y > (int)(HEIGHT*0.505) && y < (int)(HEIGHT*0.560))//first row
 				{
 					selectedRoom = 0;
 				}
-				else if (y > 618 && y < 678)//second row
+				else if (y > (int)(HEIGHT*0.572) && y < (int)(HEIGHT*0.628))//second row
 				{
 					selectedRoom = 2;
 				}
-				else if (y > 698 && y < 755)//third row
+				else if (y > (int)(HEIGHT*0.646) && y < (int)(HEIGHT*0.699))//third row
 				{
 					selectedRoom = 4;
 				}
-				else if (y > 774 && y < 830)//fourth row
+				else if (y > (int)(HEIGHT*0.717) && y < (int)(HEIGHT*0.769))//fourth row
 				{
 					selectedRoom = 6;
 				}
-				else if (y > 851 && y < 909)//fifth row
+				else if (y > (int)(HEIGHT*0.788) && y < (int)(HEIGHT*0.842))//fifth row
 				{
 					selectedRoom = 8;
 				}
-				else if(y > 923 && y < 982)//sixth row
+				else if(y > (int)(HEIGHT*0.855) && y < (int)(HEIGHT*0.909))//sixth row
 				{
 					selectedRoom = 10;
 				}
 			}
-			else if  (x > 1575 && x < 1780)//right column
+			else if  (x > (int)(WIDTH*0.820) && x < (int)(WIDTH*0.927))//right column
 			{
-				if (y > 545 && y < 605)//first row
+				if (y > (int)(HEIGHT*0.505) && y < (int)(HEIGHT*0.560))//first row
 				{
 					selectedRoom = 1;
 				}
-				else if (y > 618 && y < 678)//second row
+				else if (y > (int)(HEIGHT*0.572) && y < (int)(HEIGHT*0.628))//second row
 				{
 					selectedRoom = 3;
 				}
-				else if (y > 698 && y < 755)//third row
+				else if (y > (int)(HEIGHT*0.646) && y < (int)(HEIGHT*0.699))//third row
 				{
 					selectedRoom = 5;
 				}
-				else if (y > 774 && y < 830)//fourth row
+				else if (y > (int)(HEIGHT*0.717) && y < (int)(HEIGHT*0.769))//fourth row
 				{
 					selectedRoom = 7;
 				}
-				else if (y > 851 && y < 909)//fifth row
+				else if (y > (int)(HEIGHT*0.788) && y < (int)(HEIGHT*0.842))//fifth row
 				{
 					selectedRoom = 9;
 				}
-				else if(y > 923 && y < 982)//sixth row
+				else if(y > (int)(HEIGHT*0.855) && y < (int)(HEIGHT*0.909))//sixth row
 				{
 					selectedRoom = 11;
 				}
@@ -188,11 +188,11 @@ private class MouseControl extends MouseAdapter
 		}
 		else
 		{
-			if (x > 1637 && x < 1690 && y > 554 && y < 594)
+			if (x > (int)(WIDTH*0.853) && x < (int)(WIDTH*0.880) && y > (int)(HEIGHT*0.513) && y < (int)(HEIGHT*0.550))
 			{
 				selectedRoom = -1;
 			}
-			else if (x > 1262 && x < 1358 && y > 695 && y < 732)
+			else if (x > (int)(WIDTH*0.657) && x < (int)(WIDTH*0.707) && y > (int)(HEIGHT*0.644) && y < (int)(HEIGHT*0.678))
 			{
 				if (rooms[selectedRoom] == null)
 				{
@@ -205,7 +205,7 @@ private class MouseControl extends MouseAdapter
 					}
 				}
 			}
-			else if (x > 1586 && x < 1682 && y > 710 && y < 751)
+			else if (x > (int)(WIDTH*0.826) && x < (int)(WIDTH*0.876) && y > (int)(HEIGHT*0.657) && y < (int)(HEIGHT*0.695))
 			{
 				if (rooms[selectedRoom] == null)
 				{
@@ -213,7 +213,7 @@ private class MouseControl extends MouseAdapter
 					selectedRoom = -1;
 				}
 			}
-			else if (x > 1262 && x < 1358 && y > 782 && y < 820)
+			else if (x > (int)(WIDTH*0.657) && x < (int)(WIDTH*0.707) && y > (int)(HEIGHT*0.724) && y < (int)(HEIGHT*0.759))
 			{
 				if (rooms[selectedRoom] == null)
 				{
@@ -221,7 +221,7 @@ private class MouseControl extends MouseAdapter
 					selectedRoom = -1;
 				}
 			}
-			else if (x > 1588 && x < 1681 && y > 808 && y < 845)
+			else if (x > (int)(WIDTH*0.827) && x < (int)(WIDTH*0.876) && y > (int)(HEIGHT*0.748) && y < (int)(HEIGHT*0.782))
 			{
 				if (rooms[selectedRoom] == null)
 				{
@@ -236,7 +236,7 @@ private class MouseControl extends MouseAdapter
 				makeRoom ("mill");
 				selectedRoom = -1;
 			}
-			else if (x > 1263 && x < 1357 && y > 864 && y < 901)
+			else if (x > (int)(WIDTH*0.658) && x < (int)(WIDTH*0.707) && y > (int)(HEIGHT*0.800) && y < (int)(HEIGHT*0.834))
 			{
 				if (rooms[selectedRoom] == null)
 				{
@@ -249,7 +249,7 @@ private class MouseControl extends MouseAdapter
 					}
 				}
 			}
-			else if (x > 1587 && x < 1682 && y > 897 && y < 933)
+			else if (x > (int)(WIDTH*0.827) && x < (int)(WIDTH*0.876) && y > (int)(HEIGHT*0.831) && y < (int)(HEIGHT*0.864))
 			{
 				if (rooms[selectedRoom] == null)
 				{
@@ -257,7 +257,7 @@ private class MouseControl extends MouseAdapter
 					selectedRoom = -1;
 				}
 			}
-			else if (x > 1268 && x < 1398 && y > 981 && y < 1020)
+			else if (x > (int)(WIDTH*0.660) && x < (int)(WIDTH*0.728) && y > (int)(HEIGHT*0.841) && y < (int)(HEIGHT*0.874))
 			{
 				makeRoom ("");
 				selectedRoom = -1;
@@ -434,15 +434,16 @@ private class MouseControl extends MouseAdapter
 	//draws images to the screen. Any changes that affect the screen go here.
 	protected void render(Graphics2D g){
 		
+		@SuppressWarnings("unused")
 		boolean temp;
 		
-		temp = g.drawImage(background, 0, 0, WIDTH, HEIGHT, null);
+		temp = g.drawImage(background, 0, 0, (int)(WIDTH*1.0), (int)(HEIGHT*1.0), null);
 		
 		for (int i=0;i<20;i++)
 		{
 			if (monsters[i] != null)
 			{
-				g.drawImage(monsters[i].getSprite(), monsters[i].getX(), 881, 64, 64, null);
+				g.drawImage(monsters[i].getSprite(), (int)(WIDTH*monsters[i].getX()), (int)(HEIGHT*0.816), (int)(WIDTH*0.033), (int)(HEIGHT*0.059), null);
 			}
 		}
 		
@@ -450,24 +451,24 @@ private class MouseControl extends MouseAdapter
 		
 		if (night)
 		{
-			g.drawString("Night " + day, 100, 75);
+			g.drawString("Night " + day, (int)(WIDTH*0.052), (int)(HEIGHT*0.069));
 		}
 		else
 		{
-			g.drawString("Day " + day, 100, 75);
+			g.drawString("Day " + day, (int)(WIDTH*0.052), (int)(HEIGHT*0.069));
 		}
 		
-		g.drawString("Health: " + hp, 200, 75);
-		g.drawString("Wood: " + wood, 300, 75);
-		g.drawString("Stone: " + stone, 400, 75);
-		g.drawString("Gold: " + gold, 500, 75);
-		g.drawString("Food: " + food, 600, 75);
-		g.drawString("Knights: " + defenses.getKNum(), 700, 75);
-		g.drawString("Archers: " + defenses.getANum(), 800, 75);
-		g.drawString("Peasants: " + (people-worked) + "/" + people, 900, 75);
+		g.drawString("Health: " + hp, (int)(WIDTH*0.104), (int)(HEIGHT*0.069));
+		g.drawString("Wood: " + wood, (int)(WIDTH*0.156), (int)(HEIGHT*0.069));
+		g.drawString("Stone: " + stone, (int)(WIDTH*0.208), (int)(HEIGHT*0.069));
+		g.drawString("Gold: " + gold, (int)(WIDTH*0.260), (int)(HEIGHT*0.069));
+		g.drawString("Food: " + food, (int)(WIDTH*0.313), (int)(HEIGHT*0.069));
+		g.drawString("Knights: " + defenses.getKNum(), (int)(WIDTH*0.365), (int)(HEIGHT*0.069));
+		g.drawString("Archers: " + defenses.getANum(), (int)(WIDTH*0.417), (int)(HEIGHT*0.069));
+		g.drawString("Peasants: " + (people-worked) + "/" + people, (int)(WIDTH*0.469), (int)(HEIGHT*0.069));
 		
 		if (selectedRoom != -1)
-			g.drawImage(build, (WIDTH/2), (HEIGHT/2), 750, 500, null);
+			g.drawImage(build, (WIDTH/2), (HEIGHT/2), (int)(WIDTH*0.391), (int)(HEIGHT*0.463), null);
 	}
 	
 	
@@ -528,7 +529,7 @@ private class MouseControl extends MouseAdapter
 			{
 				if (monsters[j] != null)
 				{
-					if (monsters[j].getX() >= 723)
+					if (monsters[j].getX() >= 0.377)
 					{
 						dead = monsters[j].dealDamage(defenses.getKDam());
 						

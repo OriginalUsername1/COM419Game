@@ -1,3 +1,8 @@
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 public class Defense {
 	
@@ -5,18 +10,37 @@ public class Defense {
 	private int archerDamage;
 	private int numKnights;
 	private int knightDamage;
-	private int knightHealth;
-	private int temp;
+	private int knightMaxHealth;
+	private int hp;
+	private BufferedImage attack[];
+	private BufferedImage die[];
+	private String action;
+	private int frame;
 	
 	
 	public Defense ()
 	{
 		numArchers = 0;
 		archerDamage = 1;
-		numKnights = 1;
-		knightHealth = 10;
+		numKnights = 2;
+		knightMaxHealth = 20;
 		knightDamage = 5;
-		temp = 0;
+		hp = knightMaxHealth;
+		action = "idle";
+		frame = 0;
+		
+		attack = new BufferedImage[9];
+		die = new BufferedImage[9];
+		
+		try {
+			for (int i=0;i<9;i++)
+			{
+				attack[i] = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\knight\\" + "attack" + i + ".png"));
+				die[i] = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\knight\\" + "die" + i + ".png"));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -29,6 +53,8 @@ public class Defense {
 	
 	public int getKDam ()
 	{
+		frame = 0;
+		action = "attack";
 		return knightDamage;
 	}
 	
@@ -45,15 +71,59 @@ public class Defense {
 	}
 	
 	
+	public int getHP()
+	{
+		return hp;
+	}
+	
+	
 	public void attack (int damage)
 	{
-		temp += damage;
+		hp -= damage;
 		
-		if (temp >= knightHealth)
+		if (hp <= 0)
 		{
 			numKnights--;
-			temp = 0;
+			hp = knightMaxHealth;
+			action = "die";
+			frame = 0;
 		}
+	}
+	
+	
+	public BufferedImage getFrame ()
+	{
+		if (action == "attack")
+		{
+			if (frame < 8)
+			{
+				frame++;
+				return attack [frame];
+			}
+			else
+			{
+				action = "idle";
+				frame = 0;
+			}
+		}
+		if (action == "idle")
+		{
+			return attack[0];
+		}
+		if (action == "die")
+		{
+			if (frame < 8)
+			{
+				frame++;
+				return die[frame];
+			}
+			else
+			{
+				return die[8];
+			}
+		}
+		
+		return attack[0];
 	}
 	
 	
@@ -82,7 +152,7 @@ public class Defense {
 		}
 		else if (up == "kHP")
 		{
-			knightHealth += amount;
+			knightMaxHealth += amount;
 		}
 	}
 	

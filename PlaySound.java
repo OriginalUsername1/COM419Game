@@ -7,11 +7,13 @@ import javax.sound.sampled.Clip;
 public class PlaySound {
 	
 	private Clip clip;
-	private AudioInputStream audioInputStream;
+	//private AudioInputStream audioInputStream;
 	
 	@SuppressWarnings("static-access")
 	public PlaySound(String song) 
 	{
+		AudioInputStream audioInputStream;
+		
 	    try {
 	        audioInputStream = AudioSystem.getAudioInputStream(new File(System.getProperty("user.dir") + "\\assets\\" + song + ".wav").getAbsoluteFile());
 	        clip = AudioSystem.getClip();
@@ -34,7 +36,7 @@ public class PlaySound {
 	public void stop ()
 	{
 		clip.stop();
-		clip.setFramePosition(0);
+		clip.close();
 	}
 	
 }

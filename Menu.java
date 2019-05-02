@@ -17,8 +17,8 @@ import javax.swing.JPanel;
 
 public class Menu implements Runnable, ImageObserver{
    
-	final int WIDTH = 800;
-	final int HEIGHT = 500;
+	final int WIDTH = 1280;
+	final int HEIGHT = 720;
 	
 	private String screen = "main";
 	private BufferedImage main;
@@ -26,7 +26,7 @@ public class Menu implements Runnable, ImageObserver{
 	private BufferedImage howTo [];
 	private int howToNum = 0;
 	private BufferedImage credits;
-	//private PlaySound menuSong;
+	private PlaySound menuSong;
    
 	JFrame frame;
 	Canvas canvas;
@@ -36,12 +36,12 @@ public class Menu implements Runnable, ImageObserver{
 	public Menu() 
 	{
 		
-		howTo = new BufferedImage [6];
+		howTo = new BufferedImage [3];
 		
 		try {
 			main = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\" + "main" + ".png"));
 			//settings = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\" + "settings" + ".png"));
-			for (howToNum=0;howToNum<6;howToNum++)
+			for (howToNum=0;howToNum<3;howToNum++)
 			{
 				howTo[howToNum] = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\" + "HTP" + howToNum + ".png"));
 			}
@@ -50,8 +50,8 @@ public class Menu implements Runnable, ImageObserver{
 			e.printStackTrace();
 		}
 		
-		//menuSong = new PlaySound ("song");
-		//menuSong.play();
+		menuSong = new PlaySound ("menu");
+		menuSong.play();
 		
 		frame = new JFrame("Game Launcher");
       
@@ -87,26 +87,26 @@ private class MouseControl extends MouseAdapter{
 		
 		int x = e.getX();
 		int y = e.getY();
-		
+				
 		if (screen == "main")
 		{
-			if (x>127 && x<360 && y>228 && y<319)
+			if (x>(int)(WIDTH*0.350) && x<(int)(WIDTH*0.604) && y>(int)(HEIGHT*0.444) && y<(int)(HEIGHT*0.586))
 			{
+				menuSong.stop();
 				Game game = new Game ();
 				new Thread(game).start();
-				//menuSong.stop();
 				
 			}
-			else if (x>444 && x<677 && y>227 && y<319)
+			else if (x>(int)(WIDTH*0.173) && x<(int)(WIDTH*0.427) && y>(int)(HEIGHT*0.669) && y<(int)(HEIGHT*0.803))
 			{
 				howToNum = 0;
 				screen = "howTo";
 			}
-			else if (x>182 && x<302 && y> 374 && y<414)
+			/*else if (x>(int)(WIDTH*0.228) && x<(int)(WIDTH*0.378) && y>(int)(HEIGHT*0.748) && y<(int)(HEIGHT*0.828))
 			{
 				screen = "settings";
-			}
-			else if (x>502 && x<623 && y>373 && y< 415)
+			}*/
+			else if (x>(int)(WIDTH*0.524) && x<(int)(WIDTH*0.780) && y>(int)(HEIGHT*0.667) && y<(int)(HEIGHT*0.807))
 			{
 				screen = "credits";
 			}
@@ -115,7 +115,7 @@ private class MouseControl extends MouseAdapter{
 		{
 			howToNum++;
 			
-			if (howToNum == 6)
+			if (howToNum == 3)
 			{
 				screen = "main";
 			}

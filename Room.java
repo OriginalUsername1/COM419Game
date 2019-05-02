@@ -1,4 +1,3 @@
-
 public class Room {
 	
 	private String name;
@@ -27,12 +26,6 @@ public class Room {
 			people = 15;
 			workingPop = 5;
 		}
-		else if (name == "mine")
-		{
-			stone = 2;
-			gold = 2;
-			workingPop = 8;
-		}
 		else if (name == "farm")
 		{
 			food = 5;
@@ -46,6 +39,12 @@ public class Room {
 		else if (name == "armory")
 		{
 			workingPop = 3;
+		}
+		else if (name == "mines")
+		{
+			stone = 2;
+			gold = 2;
+			workingPop = 8;
 		}
 		
 	}

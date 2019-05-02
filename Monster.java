@@ -9,19 +9,19 @@ public class Monster {
 	private String status;
 	private int damage;
 	private int health;
-	private int xVal;
-	private int speed;
+	private double xVal;
+	private double speed;
 	private int temp;
 	private BufferedImage sprite;
 
 // A constructor
-	public Monster(String n, int d, int h, int s) {
+	public Monster(String n, int d, int h, double s) {
 		name = n;
 		damage = d;
 		health = h;
 		status = "move";
 		speed = s;
-		xVal = -100;
+		xVal = -0.052;
                    
 		try {
 			sprite = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\" + name + ".png"));
@@ -37,8 +37,8 @@ public class Monster {
 		damage = 5;   //default
 		health = 10;
 		status = "move";
-		speed = 5;
-		xVal = -100;
+		speed = 0.003;
+		xVal = -0.052;
                     
 		try {
 			sprite = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\" + name + ".png"));
@@ -52,7 +52,7 @@ public class Monster {
 		if (status == "move")
 		{
 			xVal  += speed;
-			if (xVal >= 723)
+			if (xVal >= 0.350)
 			{
 				status = "attack";
 			}
@@ -68,7 +68,7 @@ public class Monster {
 		else if (status == "cd")
 		{
 			temp++;
-			if (temp == speed * 10)
+			if (temp == speed * 10000)
 			{
 				status = "attack";
 			}
@@ -86,7 +86,13 @@ public class Monster {
 	public BufferedImage getSprite() {return sprite;}
 	
 	
-	public int getX() {return xVal;}
+	public double getX() {return xVal;}
+	
+	
+	public int getHP() 
+	{
+		return health;
+	}
         
 	
 	public boolean dealDamage (int dam)
@@ -94,9 +100,9 @@ public class Monster {
 		health -= dam;
         	  
 		if (health < 1)
-			return false;
-		else
 			return true;
+		else
+			return false;
 	}
 	
 

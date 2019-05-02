@@ -1,6 +1,7 @@
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
@@ -15,6 +16,9 @@ import javax.imageio.ImageIO;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import java.util.Map;
+import java.util.HashMap;
 
 
 public class Game implements Runnable, ImageObserver{
@@ -32,6 +36,9 @@ public class Game implements Runnable, ImageObserver{
 	//assets
 	private BufferedImage background;
 	private BufferedImage build;
+	private BufferedImage gameOverImg;
+	private final int buildMenuWidth = WIDTH / 2;
+	private final int buildMenuHeight = HEIGHT / 2;
 	
 	//time
 	private double timer = 0;
@@ -53,7 +60,47 @@ public class Game implements Runnable, ImageObserver{
 	private int worked = 20;
 	private int people = 20;
 	private int gold = 0;
+	private int silver = 0;
 	private int hp = 100;
+
+	// Left, Top, Right, Bottom
+	private double[][] selectorPositions = new double[][] {
+		{0.671, 0.440, 0.791, 0.525}, 
+		{0.802, 0.440, 0.921, 0.525}, 
+		{0.671, 0.549, 0.791, 0.632}, 
+		{0.802, 0.549, 0.921, 0.632}, 
+		{0.671, 0.660, 0.791, 0.740}, 
+		{0.802, 0.660, 0.921, 0.740}, 
+		{0.671, 0.765, 0.791, 0.849}, 
+		{0.802, 0.765, 0.921, 0.849}, 
+	};
+
+	private double[][] buildMenuSelectorPositions = new double[][] {
+		{0.452, 0.406, 0.513, 0.440}, 
+		{0.669, 0.422, 0.730, 0.453}, 
+		{0.452, 0.496, 0.513, 0.529}, 
+		{0.669, 0.521, 0.730, 0.551}, 
+		{0.452, 0.576, 0.513, 0.608}, 
+		{0.669, 0.607, 0.730, 0.642}, 
+	};
+	private final String[] buildNames = new String[]{
+		"throne",
+		"mines",
+		"barracks",
+		"mill",
+		"armory",
+		"farm"
+	};
+	private final Map<String, BuildRequirement> buildReqs = new HashMap<String, BuildRequirement>() {
+		{
+			put("throne", new BuildRequirement(15, 15, 0, 0, 0));
+			put("mines", new BuildRequirement(0, 0, 5, 0, 0));
+			put("barracks", new BuildRequirement(10, 10, 5, 0, 0));
+			put("mill", new BuildRequirement(0, 0, 10, 0, 0));
+			put("armory", new BuildRequirement(75, 100, 3, 0, 0));
+			put("farm", new BuildRequirement(0, 0, 5, 0, 0));
+		}
+	};
 	
    
 	
@@ -61,20 +108,20 @@ public class Game implements Runnable, ImageObserver{
 	{
 		//setting variables
 		try {
-			background = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\" + "conceptBg" + ".jpg"));
+			background = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\" + "bg" + ".png"));
 			build = ImageIO.read(new File (System.getProperty("user.dir") + "\\assets\\" + "Build" + ".jpg"));
+			gameOverImg = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\" + "gameOverImg" + ".jpg"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		daySong = new PlaySound ("song");
-		nightSong = new PlaySound ("song");
+		daySong = new PlaySound ("day");
 		daySong.play();
 		
-		rooms = new Room[12];
+		rooms = new Room[8];
 		monsters = new Monster[20];
 		
-		for (int i=0;i<12;i++)
+		for (int i=0;i<8;i++)
 		{
 			rooms[i] = null;
 		}
@@ -98,7 +145,7 @@ public class Game implements Runnable, ImageObserver{
       
 		panel.add(canvas);
       
-		canvas.addMouseListener(new MouseControl());
+		canvas.addMouseListener(new MouseController());
       
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
@@ -112,162 +159,67 @@ public class Game implements Runnable, ImageObserver{
 	}
    
         
-//reading clicks. Change in the game from clicking goes here
-private class MouseControl extends MouseAdapter
-{ 
-	
-	
-	public void mouseClicked(MouseEvent e) {
+	//reading clicks. Change in the game from clicking goes here
+	public class MouseController extends MouseAdapter
+	{ 
 		
-		int x = e.getX();
-		int y = e.getY();
 		
-		System.out.println(x + ", " + y);
-		
-		if (gameover)
-		{
-			running = false;
-		}
-		
-		if (selectedRoom == -1)
-		{
-			if (x > (int)(WIDTH*0.698)  && x < (int)(WIDTH*0.805))//left column
+		public void mouseClicked(MouseEvent e) {
+			
+			int x = e.getX();
+			int y = e.getY();
+			
+			//System.out.println(((double)x/WIDTH) + ", " + ((double)y/HEIGHT));
+			
+			if (gameover)
 			{
-				if (y > (int)(HEIGHT*0.505) && y < (int)(HEIGHT*0.560))//first row
-				{
-					selectedRoom = 0;
-				}
-				else if (y > (int)(HEIGHT*0.572) && y < (int)(HEIGHT*0.628))//second row
-				{
-					selectedRoom = 2;
-				}
-				else if (y > (int)(HEIGHT*0.646) && y < (int)(HEIGHT*0.699))//third row
-				{
-					selectedRoom = 4;
-				}
-				else if (y > (int)(HEIGHT*0.717) && y < (int)(HEIGHT*0.769))//fourth row
-				{
-					selectedRoom = 6;
-				}
-				else if (y > (int)(HEIGHT*0.788) && y < (int)(HEIGHT*0.842))//fifth row
-				{
-					selectedRoom = 8;
-				}
-				else if(y > (int)(HEIGHT*0.855) && y < (int)(HEIGHT*0.909))//sixth row
-				{
-					selectedRoom = 10;
-				}
+				running = false;
 			}
-			else if  (x > (int)(WIDTH*0.820) && x < (int)(WIDTH*0.927))//right column
+			
+			if (selectedRoom == -1)
 			{
-				if (y > (int)(HEIGHT*0.505) && y < (int)(HEIGHT*0.560))//first row
-				{
-					selectedRoom = 1;
-				}
-				else if (y > (int)(HEIGHT*0.572) && y < (int)(HEIGHT*0.628))//second row
-				{
-					selectedRoom = 3;
-				}
-				else if (y > (int)(HEIGHT*0.646) && y < (int)(HEIGHT*0.699))//third row
-				{
-					selectedRoom = 5;
-				}
-				else if (y > (int)(HEIGHT*0.717) && y < (int)(HEIGHT*0.769))//fourth row
-				{
-					selectedRoom = 7;
-				}
-				else if (y > (int)(HEIGHT*0.788) && y < (int)(HEIGHT*0.842))//fifth row
-				{
-					selectedRoom = 9;
-				}
-				else if(y > (int)(HEIGHT*0.855) && y < (int)(HEIGHT*0.909))//sixth row
-				{
-					selectedRoom = 11;
-				}
-			}
-		}
-		else
-		{
-			if (x > (int)(WIDTH*0.853) && x < (int)(WIDTH*0.880) && y > (int)(HEIGHT*0.513) && y < (int)(HEIGHT*0.550))
-			{
-				selectedRoom = -1;
-			}
-			else if (x > (int)(WIDTH*0.657) && x < (int)(WIDTH*0.707) && y > (int)(HEIGHT*0.644) && y < (int)(HEIGHT*0.678))
-			{
-				if (rooms[selectedRoom] == null)
-				{
-					if (wood >= 15 && stone >= 15)
-					{
-						wood -= 15;
-						stone -= 15;
-						makeRoom ("throne");
-						selectedRoom = -1;
+				for (int i = 0; i < selectorPositions.length; i++) {
+					if (x > (int)(WIDTH*selectorPositions[i][0]) && x < (int)(WIDTH*selectorPositions[i][2]) && y > (int)(HEIGHT*selectorPositions[i][1]) && y < (int)(HEIGHT*selectorPositions[i][3])) {
+						selectedRoom = i;
 					}
 				}
 			}
-			else if (x > (int)(WIDTH*0.826) && x < (int)(WIDTH*0.876) && y > (int)(HEIGHT*0.657) && y < (int)(HEIGHT*0.695))
+			else
 			{
-				if (rooms[selectedRoom] == null)
-				{
-					makeRoom ("mine");
-					selectedRoom = -1;
-				}
-			}
-			else if (x > (int)(WIDTH*0.657) && x < (int)(WIDTH*0.707) && y > (int)(HEIGHT*0.724) && y < (int)(HEIGHT*0.759))
-			{
-				if (rooms[selectedRoom] == null)
-				{
-					makeRoom ("barracks");
-					selectedRoom = -1;
-				}
-			}
-			else if (x > (int)(WIDTH*0.827) && x < (int)(WIDTH*0.876) && y > (int)(HEIGHT*0.748) && y < (int)(HEIGHT*0.782))
-			{
-				if (rooms[selectedRoom] == null)
-				{
-					if (wood >= 10 && stone >= 10)
-					{
-						wood -= 10;
-						stone -= 10;
-						makeRoom ("armory");
-						selectedRoom = -1;
+				int buildOption = -1;
+				for (int i = 0; i < buildMenuSelectorPositions.length; i++) {
+					if (x > (int)(WIDTH*buildMenuSelectorPositions[i][0]) && x < (int)(WIDTH*buildMenuSelectorPositions[i][2]) && y > (int)(HEIGHT*buildMenuSelectorPositions[i][1]) && y < (int)(HEIGHT*buildMenuSelectorPositions[i][3])) {
+						buildOption = i;
 					}
 				}
-				makeRoom ("mill");
-				selectedRoom = -1;
-			}
-			else if (x > (int)(WIDTH*0.658) && x < (int)(WIDTH*0.707) && y > (int)(HEIGHT*0.800) && y < (int)(HEIGHT*0.834))
-			{
-				if (rooms[selectedRoom] == null)
-				{
-					if (wood >= 75 && stone >= 100)
-					{
-						wood -= 75;
-						stone -= 100;
-						makeRoom ("armory");
-						selectedRoom = -1;
+				if (buildOption == -1) {
+					selectedRoom = -1;
+				} else {
+					String buildName = buildNames[buildOption];
+					BuildRequirement req = buildReqs.get(buildName);
+					if (req.getWood() > wood) {
+						System.out.println("You don't have enough wood");
+					} else if (req.getStone() > stone) {
+						System.out.println("You don't have enough stone");
+					} else if (req.getPeasants() > people-worked) {
+						System.out.println("You don't have enough people");
+					} else if (req.getSilver() > silver) {
+						System.out.println("You don't have enough silver");
+					} else if (req.getGold() > gold) {
+						System.out.println("You don't have enough gold");
+					} else if (makeRoom(buildName)) {
+						wood -= req.getWood();
+						stone -= req.getStone();
+						worked -= req.getPeasants();
+						silver -= req.getSilver();
+						gold -= req.getGold();
+						updatePop();
 					}
 				}
 			}
-			else if (x > (int)(WIDTH*0.827) && x < (int)(WIDTH*0.876) && y > (int)(HEIGHT*0.831) && y < (int)(HEIGHT*0.864))
-			{
-				if (rooms[selectedRoom] == null)
-				{
-					makeRoom ("farm");
-					selectedRoom = -1;
-				}
-			}
-			else if (x > (int)(WIDTH*0.660) && x < (int)(WIDTH*0.728) && y > (int)(HEIGHT*0.841) && y < (int)(HEIGHT*0.874))
-			{
-				makeRoom ("");
-				selectedRoom = -1;
-			}
+		
 		}
-	
 	}
-	
-	
-}
    
 	//fps and image updating
 	long desiredFPS = 60;
@@ -343,12 +295,14 @@ private class MouseControl extends MouseAdapter
 				{
 					night = true;
 					daySong.stop();
+					nightSong = new PlaySound ("day");
 					nightSong.play();
 				}
 				else
 				{
 					night = false;
 					nightSong.stop();
+					daySong = new PlaySound ("day");
 					daySong.play();
 					day++;
 					monstersSpawned = 0;
@@ -362,6 +316,7 @@ private class MouseControl extends MouseAdapter
 					else
 					{
 						food -= people;
+						people += food/6;
 					}
 					
 					updatePop();
@@ -369,17 +324,16 @@ private class MouseControl extends MouseAdapter
 				
 			}
 			
-			if (tick % 20 == 0)
+			if (tick % 50 == 0)
 			{
 				updateRoom ("throne");
-				
 				defend ();
 			}
 			
 			if (tick % 100 == 0)
 			{
 				updateRoom ("farm");
-				updateRoom ("mine");
+				updateRoom ("mines");
 				updateRoom ("mill");
 			}
 			
@@ -433,42 +387,55 @@ private class MouseControl extends MouseAdapter
    
 	//draws images to the screen. Any changes that affect the screen go here.
 	protected void render(Graphics2D g){
+		if (hp <= 0) {
+			g.drawImage(gameOverImg, 0, 0, WIDTH, HEIGHT, null);
+			return;
+		}
 		
-		@SuppressWarnings("unused")
-		boolean temp;
+		g.drawImage(background, 0, 0, WIDTH, HEIGHT, null);
 		
-		temp = g.drawImage(background, 0, 0, (int)(WIDTH*1.0), (int)(HEIGHT*1.0), null);
-		
+		g.setColor(Color.RED);
 		for (int i=0;i<20;i++)
 		{
 			if (monsters[i] != null)
 			{
-				g.drawImage(monsters[i].getSprite(), (int)(WIDTH*monsters[i].getX()), (int)(HEIGHT*0.816), (int)(WIDTH*0.033), (int)(HEIGHT*0.059), null);
+				g.drawImage(monsters[i].getSprite(), (int)(WIDTH*monsters[i].getX()), (int)(HEIGHT*0.699), (int)(WIDTH*0.033), (int)(HEIGHT*0.059), null);
+				g.fillRect((int)(WIDTH*(monsters[i].getX()-0.01)), (int)(HEIGHT*0.680), (int)((WIDTH*0.005)*monsters[i].getHP()), (int)(HEIGHT*0.010));
 			}
 		}
 		
-		g.setColor(Color.RED);
+		g.drawImage(defenses.getFrame(), (int)(WIDTH*0.365), (int)(HEIGHT*0.660), (int)(WIDTH*0.066), (int)(HEIGHT*0.118), null);
+		
+		if (defenses.getKNum() >= 1)
+		{
+			g.fillRect((int)(WIDTH*0.350), (int)(HEIGHT*0.530), (int)((WIDTH*0.005)*defenses.getHP()), (int)(HEIGHT*0.010));
+		}
+		
+		g.fillRect((int)(WIDTH*0.104), (int)(HEIGHT*0.110), (int)((WIDTH*0.001)*hp), (int)(HEIGHT*0.010)); 
+		
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("TimesRoman", Font.PLAIN, 20));
 		
 		if (night)
 		{
-			g.drawString("Night " + day, (int)(WIDTH*0.052), (int)(HEIGHT*0.069));
+			g.drawString("Night " + day, ((int)(WIDTH*0.052)), ((int)(HEIGHT*0.100)));
 		}
 		else
 		{
-			g.drawString("Day " + day, (int)(WIDTH*0.052), (int)(HEIGHT*0.069));
+			g.drawString("Day " + day, ((int)(WIDTH*0.052)), ((int)(HEIGHT*0.100)));
 		}
 		
-		g.drawString("Health: " + hp, (int)(WIDTH*0.104), (int)(HEIGHT*0.069));
-		g.drawString("Wood: " + wood, (int)(WIDTH*0.156), (int)(HEIGHT*0.069));
-		g.drawString("Stone: " + stone, (int)(WIDTH*0.208), (int)(HEIGHT*0.069));
-		g.drawString("Gold: " + gold, (int)(WIDTH*0.260), (int)(HEIGHT*0.069));
-		g.drawString("Food: " + food, (int)(WIDTH*0.313), (int)(HEIGHT*0.069));
-		g.drawString("Knights: " + defenses.getKNum(), (int)(WIDTH*0.365), (int)(HEIGHT*0.069));
-		g.drawString("Archers: " + defenses.getANum(), (int)(WIDTH*0.417), (int)(HEIGHT*0.069));
-		g.drawString("Peasants: " + (people-worked) + "/" + people, (int)(WIDTH*0.469), (int)(HEIGHT*0.069));
+		g.drawString("Health: " + hp, (int)(WIDTH*0.104), (int)(HEIGHT*0.100));
+		g.drawString("Wood: " + wood, (int)(WIDTH*0.052), (int)(HEIGHT*0.069));
+		g.drawString("Stone: " + stone, (int)(WIDTH*0.104), (int)(HEIGHT*0.069));
+		g.drawString("Gold: " + gold, (int)(WIDTH*0.156), (int)(HEIGHT*0.069));
+		g.drawString("Food: " + food, (int)(WIDTH*0.208), (int)(HEIGHT*0.069));
+		g.drawString("Knights: " + defenses.getKNum(), (int)(WIDTH*0.260), (int)(HEIGHT*0.069));
+		g.drawString("Archers: " + defenses.getANum(), (int)(WIDTH*0.312), (int)(HEIGHT*0.069));
+		g.drawString("Peasants: " + (people-worked) + "/" + people, (int)(WIDTH*0.364), (int)(HEIGHT*0.069));
 		
 		if (selectedRoom != -1)
-			g.drawImage(build, (WIDTH/2), (HEIGHT/2), (int)(WIDTH*0.391), (int)(HEIGHT*0.463), null);
+			g.drawImage(build, ((WIDTH - buildMenuWidth)/2), ((HEIGHT- buildMenuHeight)/2), buildMenuWidth, buildMenuHeight, null);
 	}
 	
 	
@@ -498,7 +465,7 @@ private class MouseControl extends MouseAdapter
 	{
 		int i=0;
 		
-		for (i=0;i<12;i++)
+		for (i=0;i<8;i++)
 		{
 			if (rooms[i] != null)
 			{
@@ -523,25 +490,26 @@ private class MouseControl extends MouseAdapter
 		int i=0, j=0;
 		boolean dead = false;
 		
-		for (i=0;i<defenses.getKNum();i++)
+		if (defenses.getKNum() >= 1)
 		{
-			for (j=0;j<20;j++)
+			for (i=0;i<20;i++)
 			{
-				if (monsters[j] != null)
+				if (monsters[i] != null)
 				{
-					if (monsters[j].getX() >= 0.377)
+					if (monsters[i].getX() >= 0.350)
 					{
-						dead = monsters[j].dealDamage(defenses.getKDam());
+						dead = monsters[i].dealDamage(defenses.getKDam());
 						
 						if (dead)
-							monsters[j] = null;
-						
+						{
+							monsters[i] = null;
+						}
+												
 						break;
 					}
 				}
 			}
 		}
-		
 		
 		for (i=0;i<defenses.getANum();i++)
 		{
@@ -596,24 +564,24 @@ private class MouseControl extends MouseAdapter
 	
 	
 	//builds a room
-	private void makeRoom (String roomType)
+	private boolean makeRoom (String roomType)
 	{
+		
 		if (selectedRoom != -1)
 		{
 			if (rooms[selectedRoom] == null)
 			{
 				rooms[selectedRoom] = new Room (roomType);
+				return true;
 			}
 			else
 			{
-				rooms[selectedRoom] = null;
-				rooms[selectedRoom] = new Room (roomType);
+				return false;
 			}
 		}
 		
-		updatePop ();
 		
-		return;
+		return false;
 	}
 	
 	
@@ -644,7 +612,7 @@ private class MouseControl extends MouseAdapter
 			}
 		}
 		
-		for (i=0;i<12;i++)
+		for (i=0;i<8;i++)
 		{
 			if (rooms[i] != null)
 			{

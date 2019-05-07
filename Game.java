@@ -24,8 +24,8 @@ import java.util.HashMap;
 public class Game implements Runnable, ImageObserver{
    
 	//screen stuff
-	final int WIDTH = 1920;
-	final int HEIGHT = 1080;
+	final int WIDTH = 1600;
+	final int HEIGHT = 860;
 	JFrame frame;
 	Canvas canvas;
 	BufferStrategy bufferStrategy;
@@ -37,13 +37,15 @@ public class Game implements Runnable, ImageObserver{
 	private BufferedImage background;
 	private BufferedImage build;
 	private BufferedImage gameOverImg;
-	private final int buildMenuWidth = WIDTH / 2;
-	private final int buildMenuHeight = HEIGHT / 2;
+	private BufferedImage pauseMenu[];
+	private int buildMenuWidth = (int)(WIDTH/2);
+	private int buildMenuHeight = (int)(HEIGHT/2);
 	
 	//time
 	private double timer = 0;
 	private int tick = 0;
 	private int day = 1;
+	private boolean pause = false;
 	
 	//monsters
 	private Monster monsters[];
@@ -82,6 +84,7 @@ public class Game implements Runnable, ImageObserver{
 		{0.669, 0.521, 0.730, 0.551}, 
 		{0.452, 0.576, 0.513, 0.608}, 
 		{0.669, 0.607, 0.730, 0.642}, 
+		{0.454, 0.692, 0.541, 0.729}
 	};
 	private final String[] buildNames = new String[]{
 		"throne",
@@ -89,16 +92,19 @@ public class Game implements Runnable, ImageObserver{
 		"barracks",
 		"mill",
 		"armory",
-		"farm"
+		"farm",
+		"destroy"
 	};
+	@SuppressWarnings("serial")
 	private final Map<String, BuildRequirement> buildReqs = new HashMap<String, BuildRequirement>() {
 		{
 			put("throne", new BuildRequirement(15, 15, 0, 0, 0));
 			put("mines", new BuildRequirement(0, 0, 5, 0, 0));
 			put("barracks", new BuildRequirement(10, 10, 5, 0, 0));
 			put("mill", new BuildRequirement(0, 0, 10, 0, 0));
-			put("armory", new BuildRequirement(75, 100, 3, 0, 0));
+			put("armory", new BuildRequirement(20, 25, 3, 0, 0));
 			put("farm", new BuildRequirement(0, 0, 5, 0, 0));
+			put ("destroy", new BuildRequirement(0, 0, 0, 0, 0));
 		}
 	};
 	
@@ -107,10 +113,16 @@ public class Game implements Runnable, ImageObserver{
 	public Game() 
 	{
 		//setting variables
+		pauseMenu = new BufferedImage[3];
+		
 		try {
 			background = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\" + "bg" + ".png"));
 			build = ImageIO.read(new File (System.getProperty("user.dir") + "\\assets\\" + "Build" + ".jpg"));
 			gameOverImg = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\" + "gameOverImg" + ".jpg"));
+			for (int i=0;i<3;i++)
+			{
+				pauseMenu[i] = ImageIO.read(new File(System.getProperty("user.dir") + "\\assets\\" + "HTP" + i + ".png"));
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -174,9 +186,29 @@ public class Game implements Runnable, ImageObserver{
 			if (gameover)
 			{
 				running = false;
+			} 
+			else if (pause)
+			{
+				if (selectedRoom < 2)
+				{
+					selectedRoom ++;
+				}
+				else if (selectedRoom == 2)
+				{
+					selectedRoom = -1;
+					pause = false;
+					buildMenuWidth = (int)(WIDTH/2);
+					buildMenuHeight = (int)(HEIGHT/2);
+				}
 			}
-			
-			if (selectedRoom == -1)
+			else if (x > (int)(0.850*WIDTH) && y < (int)(0.150*HEIGHT))
+			{
+				selectedRoom = 0;
+				pause = true;
+				buildMenuWidth = (int)(WIDTH/1.25);
+				buildMenuHeight = (int)(HEIGHT/1.25);
+			}
+			else if (selectedRoom == -1)
 			{
 				for (int i = 0; i < selectorPositions.length; i++) {
 					if (x > (int)(WIDTH*selectorPositions[i][0]) && x < (int)(WIDTH*selectorPositions[i][2]) && y > (int)(HEIGHT*selectorPositions[i][1]) && y < (int)(HEIGHT*selectorPositions[i][3])) {
@@ -282,8 +314,10 @@ public class Game implements Runnable, ImageObserver{
 	//game updates. Change in the  game based on time goes here
 	protected void update (int deltaTime)
 	{
-		
-		timer += (deltaTime/4);
+		if (!pause)
+		{
+			timer += (deltaTime/4);
+		}
 		
 		if (timer >= 10)
 		{
@@ -433,9 +467,19 @@ public class Game implements Runnable, ImageObserver{
 		g.drawString("Knights: " + defenses.getKNum(), (int)(WIDTH*0.260), (int)(HEIGHT*0.069));
 		g.drawString("Archers: " + defenses.getANum(), (int)(WIDTH*0.312), (int)(HEIGHT*0.069));
 		g.drawString("Peasants: " + (people-worked) + "/" + people, (int)(WIDTH*0.364), (int)(HEIGHT*0.069));
+		g.drawString("Help", (int)(WIDTH*0.900), (int)(HEIGHT*0.100));
 		
 		if (selectedRoom != -1)
-			g.drawImage(build, ((WIDTH - buildMenuWidth)/2), ((HEIGHT- buildMenuHeight)/2), buildMenuWidth, buildMenuHeight, null);
+		{
+			if (pause)
+			{
+				g.drawImage(pauseMenu[selectedRoom], ((WIDTH - buildMenuWidth)/2), ((HEIGHT- buildMenuHeight)/2), buildMenuWidth, buildMenuHeight, null);
+			}
+			else
+			{
+				g.drawImage(build, ((WIDTH - buildMenuWidth)/2), ((HEIGHT- buildMenuHeight)/2), buildMenuWidth, buildMenuHeight, null);
+			}
+		}
 	}
 	
 	
@@ -566,12 +610,20 @@ public class Game implements Runnable, ImageObserver{
 	//builds a room
 	private boolean makeRoom (String roomType)
 	{
-		
+		if (roomType == "destroy")
+		{
+			return destroyRoom();
+		}
 		if (selectedRoom != -1)
 		{
 			if (rooms[selectedRoom] == null)
 			{
 				rooms[selectedRoom] = new Room (roomType);
+				
+				if (roomType == "armory")
+				{
+					defenses.recruit("knight");
+				}
 				return true;
 			}
 			else
@@ -580,6 +632,26 @@ public class Game implements Runnable, ImageObserver{
 			}
 		}
 		
+		
+		return false;
+	}
+	
+	
+	private boolean destroyRoom ()
+	{
+		if (selectedRoom != -1)
+		{
+			if (rooms[selectedRoom] == null)
+			{
+				return false;
+			}
+			else
+			{
+				rooms[selectedRoom] = null;
+				
+				return true;
+			}
+		}
 		
 		return false;
 	}
